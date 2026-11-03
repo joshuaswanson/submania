@@ -49,6 +49,12 @@ function mergedPositions(root) {
 export async function loadModels(onProgress) {
   const draco = new DRACOLoader().setDecoderPath(`${import.meta.env.BASE_URL}draco/`);
   const loader = new GLTFLoader().setDRACOLoader(draco);
+  // Safari keeps an ImageBitmap's pixels in its GPU process, which iOS shuts down under memory pressure. WebGL comes
+  // back, but those textures upload black. An image element keeps its encoded file and decodes it again.
+  loader.register((parser) => {
+    parser.textureLoader = new THREE.TextureLoader(parser.options.manager).setCrossOrigin(parser.options.crossOrigin);
+    return { name: 'image_element_textures' };
+  });
   let done = 0;
   await Promise.all(MODEL_NAMES.map(async (name) => {
     const gltf = await loader.loadAsync(`${import.meta.env.BASE_URL}models/${name}.glb`);
