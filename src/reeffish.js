@@ -36,7 +36,7 @@ function addSwim(material, rate) {
         transformed.z += sin( uTime * ${rate.toFixed(1)} * ( 0.8 + 0.4 * fract( aFish.x * 0.37 ) ) + aFish.x
           - transformed.x * 6.0 ) * aFish.y * ( 0.25 + fishBack * fishBack );`);
   };
-  material.customProgramCacheKey = () => `${key}-reef-swim`;
+  material.customProgramCacheKey = () => `${key}-reef-swim-${rate}`;
 }
 
 function makeSpecies(name, spec, scene) {
