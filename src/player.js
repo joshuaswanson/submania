@@ -306,9 +306,11 @@ export class Player {
       this.rig.add(holder);
       return { holder, beam };
     });
+    // Fill light that keeps the sub readable in the dark. It hangs off the group, which never turns, so it always
+    // lights the side facing the camera.
     this.glow = new THREE.PointLight('#9fdfff', 0, 12, 1.4);
-    this.glow.position.set(0, 1.5, 3);
-    this.rig.add(this.glow);
+    this.glow.position.set(0, 1.5 * RIG_SCALE, 3 * RIG_SCALE);
+    this.group.add(this.glow);
     // Red light cast on the sub by the nearest enemy viewport; lives in the scene so it can sit on the enemy's side.
     this.redGlow = new THREE.PointLight('#ff2a14', 0, 16, 1.3);
     scene.add(this.redGlow);
@@ -835,7 +837,7 @@ export class Player {
     light.angle = lamps ? 0.42 + 0.06 * lamps : 0.42;
     this.beam.material.uniforms.uStrength.value = 0.035 * dark;
     this.beam.visible = dark > 0.02;
-    this.glow.intensity = (2.5 + 9 * lamps) * dark;
+    this.glow.intensity = (2.5 + 3 * lamps) * dark;
     this.glow.distance = 12 + 4 * lamps;
     for (const spot of this.spots) spot.beam.material.uniforms.uStrength.value = 0.01 + 0.032 * dark;
   }
