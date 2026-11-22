@@ -934,15 +934,14 @@ export class Player {
 
   steer(dt, input, pushDir) {
     // Holding left or right spins the turn up; letting go lets it coast to a stop wherever it ends up.
-    // Each turnaround picks at random whether the nose swings past the camera or away from it. Reversing mid-turn
-    // heads back the way it came.
+    // Every turnaround swings clockwise seen from above. Reversing mid-turn heads back the way it came.
     if (Math.abs(input.x) > 0.1 && !this.tumbling) {
       const dir = Math.sign(input.x);
       if (dir !== this.facing) {
         this.facing = dir;
         if (Math.abs(this.yaw - this.restYaw) < 0.25) {
           this.prevRestYaw = this.restYaw;
-          this.restYaw += (Math.random() < 0.5 ? -1 : 1) * Math.PI;
+          this.restYaw -= Math.PI;
         } else {
           [this.restYaw, this.prevRestYaw] = [this.prevRestYaw, this.restYaw];
         }
