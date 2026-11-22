@@ -48,6 +48,9 @@ const NOSE_LIMIT = 1.35;
 // low on the flank, so seen from the side the part never looks bolted into the tower; its barrels may pass in front.
 const TOWER = [0.15, 1];
 const BESIDE_TOWER = 25;
+// A part mounted behind or ahead of the tower whose body still reaches alongside it stays this far off the top, so
+// its barrels pass beside the tower.
+const PAST_TOWER = 40;
 // Rough space each part takes on the hull: how far it reaches back and forward along the hull from its mount, and
 // how wide it is around the hull. Used to keep parts from bolting into each other.
 const ENVELOPE = {
@@ -55,6 +58,12 @@ const ENVELOPE = {
   grapple: [-0.15, 0.15, 0.15], sonar: [-0.35, 0.35, 0.3], propulsion: [-0.75, 0.5, 0.3], spotlight: [-0.35, 0.4, 0.25],
   junk: [-0.3, 0.3, 0.3],
 };
+const gap = (a, b) => Math.abs(THREE.MathUtils.degToRad(((a - b + 540) % 360) - 180));
+
+function envelopesMeet(a, b) {
+  return a.x0 < b.x1 && a.x1 > b.x0 && gap(a.angle, b.angle) * Math.min(a.around, b.around) < a.width + b.width;
+}
+
 const BASE_RADIUS = {
   cannon: 0.24, torpedo: 0.45, missile: 0.25, shield: 0.26, grapple: 0.15, sonar: 0.14, propulsion: 0.15,
   spotlight: 0.18, junk: 0.25,
@@ -438,16 +447,15 @@ export class Player {
     const sx = Math.min(x, NOSE_LIMIT);
     const fx = this.fatTarget.x;
     const around = hullRadius(sx) * this.fatTarget.yz;
-    const gap = (a, b) => Math.abs(THREE.MathUtils.degToRad(((a - b + 540) % 360) - 180));
     const onWindow = (a) => KEEP_CLEAR.some(([kx, ka, kr]) => (sx - kx) ** 2 + (gap(a, ka) * hullRadius(sx)) ** 2
       < (r + kr) ** 2);
-    const bumps = (a) => this.parts.some((p) => {
-      const e = p.envelope;
-      const overlapAlong = sx * fx + back < e.x1 && sx * fx + front > e.x0;
-      return overlapAlong && gap(a, e.angle) * Math.min(around, e.around) < width + e.width;
-    });
+    // Bolted-on junk makes way for working parts; syncParts moves it afterwards.
+    const bumps = (a) => this.parts.some((p) => (cat === 'junk' || p.cat !== 'junk')
+      && envelopesMeet(p.envelope, { x0: sx * fx + back, x1: sx * fx + front, angle: a, width, around }));
     const besideTower = sx * fx + back < TOWER[1] * fx && sx * fx + r > TOWER[0] * fx;
-    const onTower = (a) => besideTower && gap(a, 90) < THREE.MathUtils.degToRad(90 - BESIDE_TOWER);
+    const reachesTower = sx * fx + back < TOWER[1] * fx && sx * fx + front > TOWER[0] * fx;
+    const onTower = (a) => (besideTower && gap(a, 90) < THREE.MathUtils.degToRad(90 - BESIDE_TOWER))
+      || (reachesTower && gap(a, 90) < THREE.MathUtils.degToRad(PAST_TOWER));
     for (let step = 0; step <= 20; step++) {
       for (const dir of [1, -1]) {
         const a = angle + dir * step * 6;
@@ -464,6 +472,7 @@ export class Player {
   }
 
   addPart(cat, model, x, angle, animate) {
+    const home = [x, angle];
     [x, angle] = this.clearSocket(cat, x, angle);
     const [back, front, width] = ENVELOPE[cat] ?? ENVELOPE.junk;
     const envelope = {
@@ -483,7 +492,7 @@ export class Player {
     if (animate) pivot.scale.setScalar(0.01);
     this.rig.add(pivot);
     const part = {
-      cat, model, obj, pivot, socket: [x, angle], envelope, pop: animate ? 0 : 1, muzzle: findNode(obj, 'muzzle'),
+      cat, model, obj, pivot, home, socket: [x, angle], envelope, pop: animate ? 0 : 1, muzzle: findNode(obj, 'muzzle'),
       props: findNodes(obj, 'thruster_prop'), dish: findNode(obj, 'sonar_dish'),
       arm: findNode(obj, 'grapple_arm'), claw: findNode(obj, 'grapple_claw'), timer: Math.random(),
       barrels: findNode(obj, 'cannon_barrels'),
@@ -521,6 +530,12 @@ export class Player {
         const [x, angle] = sockets[i];
         added.push(this.addPart(cat, partModel(cat, this.levels[cat]), x, angle, animate));
       }
+    }
+    for (const junk of this.parts.filter((p) => p.cat === 'junk')) {
+      if (!this.parts.some((p) => p.cat !== 'junk' && envelopesMeet(p.envelope, junk.envelope))) continue;
+      junk.pivot.removeFromParent();
+      this.parts.splice(this.parts.indexOf(junk), 1);
+      added.push(this.addPart('junk', junk.model, ...junk.home, animate));
     }
     const junkHave = this.parts.filter((p) => p.cat === 'junk').length;
     for (let i = junkHave; i < JUNK_PER_HULL[L]; i++) {
