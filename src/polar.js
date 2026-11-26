@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { unlock } from './achievements.js';
+import { progress } from './quests.js';
 import { sfx } from './audio.js';
 import { spawn, spawnSkinned } from './assets.js';
 import { SHELF_Y, SURFACE_Y, darkness } from './water.js';
@@ -981,6 +982,7 @@ class PackIce {
     index.needsUpdate = true;
     this.broken++;
     if (this.broken >= 40) unlock('icebreaker');
+    progress('ice');
     const v = hull.vel;
     const pieces = Math.min(9, 2 + Math.round(p.rad * 3));
     for (let k = 0; k < pieces; k++) {

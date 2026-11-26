@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { addStat, unlock } from './achievements.js';
+import { progress, setback, startQuests } from './quests.js';
 import { cloneMaterial, findNode, ownMaterials, spawn } from './assets.js';
 import { RIG_SCALE, makeBeam } from './player.js';
 import { WATER, addWaterline } from './surface.js';
@@ -598,6 +599,8 @@ export class Game {
     this.coinsTotal = 0;
     this.kills = 0;
     this.wave = 0;
+    this.wasAirborne = false;
+    startQuests(this);
     this.queue = [];
     this.spawnTimer = 0;
     // A calm stretch before the first wave, so the dive opens with the sunlit music and time to look around.
@@ -723,6 +726,7 @@ export class Game {
     this.hud.showToast(t('upgraded', { name: def.name, n: lvl + 1 }));
     if (lvl + 1 >= def.max) unlock('max_upgrade');
     if (id === 'hull' && this.player.duck.visible) unlock('rubber_duck');
+    progress('upgrade');
     added.forEach((part, i) => {
       setTimeout(() => {
         part.pivot.getWorldPosition(this.tmp);
@@ -953,7 +957,11 @@ export class Game {
       this.kills++;
       unlock('first_sink');
       if (addStat('kills') >= 100) unlock('sink_100');
+      progress('sink');
+      progress('streak');
+      if (e.type === 'gunner') progress('gunner');
     }
+    if (e.type === 'mine' && killer === this.localPlayer) progress('mines');
     if (e.type === 'boss') unlock('boss');
     if (this.role === 'host') this.net.event({ t: 'kill', id: e.id, by: killer?.netId });
     if (e.type === 'boss') {
@@ -1161,6 +1169,7 @@ export class Game {
   hurtPlayer(amount, from) {
     if (this.player.invuln > 0 || !this.player.alive) return;
     this.hitThisWave = true;
+    setback('streak');
     const res = this.player.takeHit(amount * (1 + this.wave * 0.04), from);
     this.hud.flashHealth();
     const c = this.player.center;
@@ -1335,7 +1344,10 @@ export class Game {
           g.t = 0;
           if (g.target.def && !g.target.dead) {
             this.damageEnemy(g.target, 3 + 2 * pl.levels.grapple);
-            if (g.target.dead && g.target.type !== 'mine') unlock('grapple_kill');
+            if (g.target.dead && g.target.type !== 'mine') {
+              unlock('grapple_kill');
+              progress('grapple');
+            }
             this.effects.sparkle({ x: tp.x, y: tp.y, z: 0.6 }, '#ffffff', 10, 5);
           } else if (g.target.value) {
             g.target.grabbed = true;
@@ -1379,8 +1391,12 @@ export class Game {
         const to = new THREE.Vector2(e.obj.position.x - c.origin.x, e.obj.position.y - c.origin.y);
         const d = to.length();
         if (d < range && to.dot(c.dir) > d * Math.cos(0.45)) {
+          if (e.type !== 'mine') {
+            unlock('dazzle');
+            if (!e.dazzleCounted) progress('dazzle');
+            e.dazzleCounted = true;
+          }
           e.dazzled = 0.3;
-          if (e.type !== 'mine') unlock('dazzle');
         }
       }
     }
@@ -1475,8 +1491,11 @@ export class Game {
       if (e.type === 'mine' && !guest) {
         const victim = this.enemies.find((o) => o !== e && !o.dead && o.type !== 'mine' && this.enemyHit(o, p.x, p.y, 0.55));
         if (victim) {
-          if (performance.now() - (victim.bumpedAt ?? -Infinity) < MINE_BUMP_WINDOW) unlock('mine_bump');
-          this.killEnemy(e);
+          if (performance.now() - (victim.bumpedAt ?? -Infinity) < MINE_BUMP_WINDOW) {
+            unlock('mine_bump');
+            progress('mine_bump');
+          }
+          this.killEnemy(e, null);
           continue;
         }
       }
@@ -1484,7 +1503,7 @@ export class Game {
         if (e.type === 'mine') {
           if (pl.invuln <= 0 && pl.hitTest(p.x, p.y, e.def.ry)) {
             if (guest) this.damageEnemy(e, 999);
-            else this.killEnemy(e);
+            else this.killEnemy(e, null);
           }
         } else if (this.hullContact(e)) {
           this.bump(e);
@@ -2183,6 +2202,7 @@ export class Game {
         this.coins += c.value;
         this.coinsTotal += c.value;
         if (this.coinsTotal >= 1000) unlock('coins_1000');
+        progress('coins', c.value);
         this.effects.coinBurst(p);
         this.hud.pulseCoins();
         sfx.coin();
@@ -2331,6 +2351,8 @@ export class Game {
     if (this.intro && this.playIntro(dt)) return;
     const pl = this.player;
     pl.update(dt, input, this.bounds);
+    if (pl.airborne && !this.wasAirborne) progress('jump');
+    this.wasAirborne = pl.airborne;
     for (const r of this.remotePlayers) this.net.updateRemote(r, dt);
     this.lastDt = dt;
     this.bumpFriends();

@@ -13,6 +13,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 import { ACHIEVEMENT_REWARD, onUnlock, setActive, unlock } from './achievements.js';
+import { onQuestComplete, onQuestsChanged, setQuestsActive } from './quests.js';
 import { SHADOW_LAYER, loadModels, warmUp } from './assets.js';
 import { SHADER_TIME, WATER } from './surface.js';
 import { getVolume, setAmbience, setMusic, setVolume, sfx, toggleMute, unlockAudio } from './audio.js';
@@ -501,8 +502,18 @@ onUnlock((def) => {
   hud.pulseCoins();
 });
 
+onQuestsChanged((quests) => hud.showQuests(quests));
+onQuestComplete((quest) => {
+  sfx.achievement();
+  game.coins += quest.reward;
+  game.coinsTotal += quest.reward;
+  hud.pulseCoins();
+});
+
 function tick(dt) {
-  setActive(state === 'playing' && !cinematic && !game.intro);
+  const diving = state === 'playing' && !cinematic && !game.intro;
+  setActive(diving);
+  setQuestsActive(diving);
   if (state !== 'paused') SHADER_TIME.value += dt;
   if (state === 'playing') {
     game.update(dt, scriptedInput ?? readInput());

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { unlock } from './achievements.js';
+import { progress } from './quests.js';
 import { animationsOf, cloneMaterial, findNode, plainMaterials, spawn, spawnSkinned, tint } from './assets.js';
 import { sfx } from './audio.js';
 import { Polar, nearIce, polarAt, trenchAt } from './polar.js';
@@ -2205,7 +2206,10 @@ export class World {
     if (hull.airborne) unlock('flying_sub');
     this.trackLeap(hull);
     const floor = floorY(c.x);
-    if (floor < ANGLER_FLOOR && c.y - hull.extents.hy - seabedAt(c.x) < 1.5) unlock('abyss');
+    if (floor < ANGLER_FLOOR && c.y - hull.extents.hy - seabedAt(c.x) < 1.5) {
+      unlock('abyss');
+      progress('trench');
+    }
     if (this.vesselPoints?.some((p) => this.inSpotlight(p))) unlock('shipwreck');
   }
 
@@ -2476,6 +2480,7 @@ export class World {
     if (this.updateGulls(dt, cx, cy, hull, camera.position.z) > 0) {
       sfx.gull();
       unlock('gulls');
+      progress('gulls');
     }
     if (hull) this.checkAchievements(hull);
     // Whale song carries through the water, so it is heard only with the whole sub under the surface.

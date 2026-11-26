@@ -108,7 +108,10 @@ export class Hud {
 
     this.overlay = el('div', 'overlay');
     this.achievementPops = el('div', 'ach-pops');
-    root.append(this.pauseBtn, this.radar, this.bossBar, this.banner, this.toast, this.bar, this.overlay,
+    this.questBox = el('div', 'quests');
+    this.questRows = [];
+    this.quests = [];
+    root.append(this.pauseBtn, this.radar, this.questBox, this.bossBar, this.banner, this.toast, this.bar, this.overlay,
       this.achievementPops);
     this.onStart = onStart;
     this.onHost = onHost;
@@ -133,6 +136,8 @@ export class Hud {
   // Text that stays on screen between redraws, set again whenever the language changes.
   relabel() {
     this.pauseBtn.setAttribute('aria-label', t('pause'));
+    for (const row of this.questRows) row.uid = null;
+    this.showQuests(this.quests, false);
     this.bossBar.querySelector('.boss-name').textContent = t('boss');
     this.rotateNote.querySelector('span').textContent = t('rotate');
     for (const s of this.slots) {
@@ -434,6 +439,31 @@ export class Hud {
       pop.animate([{ marginTop: '0px' }, { marginTop: `${-room}px` }], { duration: 450, easing: 'ease-in-out', fill: 'forwards' })
         .finished.then(() => pop.remove());
     }, 4150);
+  }
+
+  // A quest that takes a finished one's place slides in where it stood.
+  showQuests(quests, animate = true) {
+    this.quests = quests;
+    quests.forEach((q, i) => {
+      let row = this.questRows[i];
+      if (row?.uid !== q.uid) {
+        const fresh = el('div', 'quest', `<span class="quest-text"></span>
+          <span class="quest-reward"><img src="${ICON('coin')}" alt="">${q.reward}</span>
+          <span class="quest-track"><i></i></span><span class="quest-count"></span>`);
+        if (animate && row) fresh.classList.add('enter');
+        if (row) row.el.replaceWith(fresh);
+        else this.questBox.append(fresh);
+        row = this.questRows[i] = {
+          uid: q.uid, el: fresh, text: fresh.querySelector('.quest-text'), fill: fresh.querySelector('.quest-track i'),
+          count: fresh.querySelector('.quest-count'),
+        };
+        row.text.textContent = q.text;
+      }
+      row.fill.style.width = `${(100 * q.count) / q.goal}%`;
+      row.count.textContent = `${q.count}/${q.goal}`;
+      row.el.classList.toggle('done', q.done);
+      row.el.classList.toggle('single', q.goal === 1);
+    });
   }
 
   showToast(text) {

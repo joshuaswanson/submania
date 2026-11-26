@@ -143,6 +143,47 @@ html, body {
   filter: drop-shadow(0 0.4vw 0.8vw rgba(0, 0, 0, 0.55));
 }
 
+.quests {
+  position: absolute;
+  top: calc(2.6vh + max(10.5vw, 110px));
+  right: calc(1.4vw + env(safe-area-inset-right));
+  width: 15vw;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vh;
+}
+.quest {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.5vh 0.6vw;
+  padding: 0.9vh 0.8vw;
+  background: var(--navy);
+  border: 0.15vw solid var(--edge);
+  border-radius: 0.8vw;
+  box-shadow: 0 0.3vw 0.8vw rgba(0, 0, 0, 0.4);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.quest.enter { animation: quest-in 0.5s ease-out; }
+.quest-text { font-size: 0.9vw; line-height: 1.2; color: #e4f4ff; }
+.quest-reward { display: flex; align-items: center; gap: 0.2vw; font-size: 0.9vw; font-weight: 700; color: var(--gold); }
+.quest-reward img { width: 1vw; }
+.quest-track { height: 0.5vw; background: rgba(0, 0, 0, 0.45); border-radius: 999px; overflow: hidden; }
+.quest-track i { display: block; height: 100%; background: linear-gradient(#7fe3ff, #2a9fd6); border-radius: 999px;
+  transition: width 0.3s; }
+.quest-count { font-size: 0.75vw; font-weight: 600; color: #8fb4cf; text-align: right; }
+.quest.single .quest-track, .quest.single .quest-count { display: none; }
+.quest.done { border-color: var(--gold); box-shadow: 0 0 1vw rgba(255, 200, 58, 0.5); animation: quest-done 0.5s ease-out; }
+.quest.done .quest-text { color: #ffe9a8; }
+.quest.done .quest-track i { background: linear-gradient(#fff2a8, var(--gold-deep)); }
+@keyframes quest-in {
+  from { opacity: 0; transform: translateX(3vw); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes quest-done {
+  40% { transform: scale(1.06); }
+}
+
 .boss-bar {
   position: absolute;
   top: 8vh;
@@ -1049,6 +1090,12 @@ kbd {
   .ach-pop .ach-text span { font-size: 1.8vw; }
   .ach-reward { gap: 0.5vw; margin-left: 0.8vw; font-size: 2.4vw; }
   .ach-reward img { width: 2.8vw; }
+  .quests { width: 21vw; gap: 0.8vh; }
+  .quest { gap: 0.3vh 1vw; padding: 0.8vh 1.2vw; border-width: 0.25vw; border-radius: 1.2vw; }
+  .quest-text, .quest-reward { font-size: 1.45vw; }
+  .quest-reward img { width: 1.6vw; }
+  .quest-track { height: 0.7vw; }
+  .quest-count { font-size: 1.2vw; }
   .ach-box.settings-box { width: min(76vw, 820px); }
   .settings-box .ach-head { font-size: 3.2vw; }
   .settings-box .setting { font-size: 2.4vw; margin-top: 2.2vh; }
