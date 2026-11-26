@@ -4,6 +4,30 @@ import { touchScreen } from './touch.js';
 
 const ICON = (name) => `${import.meta.env.BASE_URL}icons/${name}.webp`;
 const BOLTS = '<span class="bolt tl"></span><span class="bolt tr"></span><span class="bolt bl"></span><span class="bolt br"></span>';
+// Quest symbols, drawn apart from the upgrade pictures so a quest never reads as an upgrade.
+const QUEST_ICONS = {
+  target: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>',
+  skull: '<path d="M5 11a7 7 0 0 1 14 0v3l-2 1v3H7v-3l-2-1z"/><circle cx="9" cy="11.5" r="1.6"/><circle cx="15" cy="11.5" r="1.6"/><path d="M10 18v-2M14 18v-2"/>',
+  bolt: '<path d="M13 2 5 13h6l-1 9 8-11h-6z"/>',
+  mine: '<circle cx="12" cy="12" r="5.5" fill="currentColor"/><path d="M12 6.5V4M12 20v-2.5M6.5 12H4M20 12h-2.5M8.1 8.1 6.3 6.3M17.7 17.7l-1.8-1.8M15.9 8.1l1.8-1.8M6.3 17.7l1.8-1.8"/><circle cx="12" cy="3" r="1" fill="currentColor"/><circle cx="12" cy="21" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="21" cy="12" r="1" fill="currentColor"/>',
+  hook: '<circle cx="14" cy="3.5" r="1.5"/><path d="M14 5v8a5 5 0 0 1-10 0v-1.5l3 2"/>',
+  flash: '<circle cx="5.5" cy="12" r="3" fill="currentColor"/><path d="M9 10 21 5M9 14l12 5M15 12h6"/>',
+  coins: '<ellipse cx="12" cy="6.5" rx="7" ry="3"/><path d="M5 6.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5M5 11.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
+  wrench: '<path d="M14.5 3.5a5 5 0 0 0-4.6 6.9L3.6 16.7a2 2 0 0 0 2.8 2.8l6.3-6.3a5 5 0 0 0 6.9-4.6l-3 3-3-1-1-3z"/>',
+  jump: '<path d="M2 20h5M17 20h5"/><path d="M5 18C7 8 17 8 19 18"/><path d="m19 18 .6-3.6M19 18l-3.4-1.2"/>',
+  fin: '<path d="M2 18c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><path d="M7 14c1-5 4.5-8.5 10-10-2 3.5-2.5 6.5-1.5 10"/>',
+  bird: '<path d="M2 10c4-1.5 7 0 9.5 5 2.5-5 5.5-6.5 9.5-5"/><path d="M13 5.5c1.5-.7 2.8 0 3.5 1.7.7-1.7 2-2.4 3.5-1.7"/>',
+  trench: '<path d="M12 3v12M7 10l5 5 5-5"/><path d="M3 20h18"/>',
+  snowflake: '<path d="M12 2v20M3.3 7l17.4 10M20.7 7 3.3 17"/><path d="M9.5 3.5 12 6l2.5-2.5M9.5 20.5 12 18l2.5 2.5"/>',
+  eye: '<path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  note: '<path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>',
+  anchor: '<circle cx="12" cy="5" r="2"/><path d="M12 7v14M8 10.5h8M4 13a8 8 0 0 0 16 0"/>',
+  flag: '<path d="M5 22V3M5 4h12l-3 4 3 4H5"/>',
+  waves: '<path d="M2 9c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 15.5c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/>',
+  splash: '<path d="M2 19c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><path d="M12 13V5M8 11 5.5 7M16 11l2.5-4"/>',
+};
+const questIcon = (name) => `<svg viewBox="0 0 24 24" class="quest-icon" aria-hidden="true" fill="none" stroke="currentColor"
+  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${QUEST_ICONS[name]}</svg>`;
 const LOGO = `<div class="logo-wrap"><img class="logo-img" src="${import.meta.env.BASE_URL}logo.webp" alt="Submania">
   <a class="badge" href="https://joshuaswanson.github.io" target="_blank" rel="noopener">
     <img src="${import.meta.env.BASE_URL}badge.webp" alt="by Joshua Swanson"></a></div>`;
@@ -386,7 +410,7 @@ export class Hud {
     quests.forEach((q, i) => {
       let row = this.questRows[i];
       if (row?.uid !== q.uid) {
-        const fresh = el('div', 'quest', `${BOLTS}<span class="port"><img src="${ICON(q.def.icon)}" alt=""></span>
+        const fresh = el('div', 'quest', `${BOLTS}<span class="port">${questIcon(q.def.icon)}</span>
           <span class="quest-text"></span>
           <span class="quest-reward"><img src="${ICON('coin')}" alt="">${q.reward}</span>
           <span class="quest-track"><i></i><span class="quest-count"></span></span>`);
