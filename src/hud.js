@@ -12,7 +12,6 @@ const QUEST_ICONS = {
   mine: '<circle cx="12" cy="12" r="5.5" fill="currentColor"/><path d="M12 6.5V4M12 20v-2.5M6.5 12H4M20 12h-2.5M8.1 8.1 6.3 6.3M17.7 17.7l-1.8-1.8M15.9 8.1l1.8-1.8M6.3 17.7l1.8-1.8"/><circle cx="12" cy="3" r="1" fill="currentColor"/><circle cx="12" cy="21" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="21" cy="12" r="1" fill="currentColor"/>',
   hook: '<circle cx="14" cy="3.5" r="1.5"/><path d="M14 5v8a5 5 0 0 1-10 0v-1.5l3 2"/>',
   flash: '<circle cx="5.5" cy="12" r="3" fill="currentColor"/><path d="M9 10 21 5M9 14l12 5M15 12h6"/>',
-  coins: '<ellipse cx="12" cy="6.5" rx="7" ry="3"/><path d="M5 6.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5M5 11.5v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5"/>',
   wrench: '<path d="M14.5 3.5a5 5 0 0 0-4.6 6.9L3.6 16.7a2 2 0 0 0 2.8 2.8l6.3-6.3a5 5 0 0 0 6.9-4.6l-3 3-3-1-1-3z"/>',
   jump: '<path d="M2 20h5M17 20h5"/><path d="M5 18C7 8 17 8 19 18"/><path d="m19 18 .6-3.6M19 18l-3.4-1.2"/>',
   fin: '<path d="M2 18c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><path d="M7 14c1-5 4.5-8.5 10-10-2 3.5-2.5 6.5-1.5 10"/>',

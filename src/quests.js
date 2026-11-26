@@ -22,7 +22,6 @@ const QUESTS = [
   { id: 'mine_bump', icon: 'mine', text: 'Bump an enemy sub into a sea mine', goal: () => 1, reward: 20, from: 2 },
   { id: 'grapple', icon: 'hook', text: 'Sink {n} subs with the grapple claw', goal: (w) => 2 + Math.floor(w / 4), reward: 20, needs: 'grapple' },
   { id: 'dazzle', icon: 'flash', text: 'Dazzle {n} enemies with your spotlight', goal: (w) => 3 + Math.floor(w / 3), reward: 15, needs: 'spotlight' },
-  { id: 'coins', icon: 'coins', text: 'Collect {n} coins', goal: (w) => 50 + 10 * Math.round(1.5 * w), reward: 10 },
   { id: 'upgrade', icon: 'wrench', text: 'Buy {n} upgrades', goal: () => 2, reward: 10 },
   { id: 'trench', icon: 'trench', text: 'Touch the floor of a deep trench', goal: () => 1, reward: 20, from: 2 },
   { id: 'ice', icon: 'snowflake', text: 'Smash {n} plates of pack ice', goal: () => 12, reward: 20, from: 3 },

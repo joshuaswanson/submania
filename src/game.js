@@ -2179,7 +2179,6 @@ export class Game {
         if (this.net) this.net.taken(c.id);
         this.coins += c.value;
         this.coinsTotal += c.value;
-        progress('coins', c.value);
         this.effects.coinBurst(p);
         this.hud.pulseCoins();
         sfx.coin();
