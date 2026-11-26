@@ -26,6 +26,17 @@ const QUESTS = [
   { id: 'upgrade', icon: 'hull', text: 'Buy {n} upgrades', goal: () => 2, reward: 10 },
   { id: 'trench', icon: 'sonar', text: 'Touch the floor of a deep trench', goal: () => 1, reward: 20, from: 2 },
   { id: 'ice', icon: 'hull', text: 'Smash {n} plates of pack ice', goal: () => 12, reward: 20, from: 3 },
+  { id: 'boss', icon: 'cannon', text: 'Sink Big Bad Barnacle', goal: () => 1, reward: 30, from: 4 },
+  { id: 'angler', icon: 'sonar', text: 'Swim up to an anglerfish as its lure flashes', goal: () => 1, reward: 20, from: 2 },
+  { id: 'whale_song', icon: 'sonar', text: 'Hear the humpback sing', goal: () => 1, reward: 15 },
+  { id: 'whale_shark', icon: 'sonar', text: 'Spot the whale shark cruising the open ocean', goal: () => 1, reward: 15 },
+  { id: 'sperm_whale', icon: 'spotlight', text: 'Shine your spotlight on the sperm whale down in a trench', goal: () => 1, reward: 25, needs: 'spotlight' },
+  { id: 'shipwreck', icon: 'spotlight', text: 'Shine your spotlight on the rusted fishing boat on a trench floor', goal: () => 1, reward: 20, needs: 'spotlight' },
+  { id: 'north_pole', icon: 'propulsion', text: 'Reach the North Pole', goal: () => 1, reward: 30, from: 3 },
+  { id: 'south_pole', icon: 'propulsion', text: 'Reach the South Pole', goal: () => 1, reward: 30, from: 3 },
+  { id: 'polar_bear', icon: 'sonar', text: 'Spot a polar bear on the ice', goal: () => 1, reward: 20, from: 3 },
+  { id: 'penguin_swim', icon: 'propulsion', text: 'Swim alongside a diving penguin', goal: () => 1, reward: 20, from: 3 },
+  { id: 'penguin_bowl', icon: 'hull', text: 'Ram a floe and knock {n} penguins into the sea', goal: () => 3, reward: 25, from: 3 },
 ];
 
 let game = null;

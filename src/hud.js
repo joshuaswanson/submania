@@ -1,4 +1,3 @@
-import { ACHIEVEMENTS, isUnlocked, unlockedCount } from './achievements.js';
 import { LANGUAGES, getLanguage, setLanguage, t } from './i18n.js';
 import { UPGRADES, upgradeCost } from './upgrades.js';
 import { touchScreen } from './touch.js';
@@ -8,13 +7,6 @@ const BOLTS = '<span class="bolt tl"></span><span class="bolt tr"></span><span c
 const LOGO = `<div class="logo-wrap"><img class="logo-img" src="${import.meta.env.BASE_URL}logo.webp" alt="Submania">
   <a class="badge" href="https://joshuaswanson.github.io" target="_blank" rel="noopener">
     <img src="${import.meta.env.BASE_URL}badge.webp" alt="by Joshua Swanson"></a></div>`;
-const TROPHY = `<svg viewBox="0 0 24 24" class="trophy" aria-hidden="true"><path fill="currentColor" d="M7 3h10v2h3v3a4
-  4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3V3zm0 4H6v1a2 2 0 0 0 1
-  1.7V7zm10 0v2.7A2 2 0 0 0 18 8V7h-1z"/></svg>`;
-const LOCK = `<svg viewBox="0 0 24 24" class="trophy" aria-hidden="true"><path fill="currentColor" d="M12 2a5 5 0 0 1 5 5v3h1a2
-  2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v3h6V7a3 3 0 0 0-3-3z"/></svg>`;
-const achievementsButton = () => `<button class="side-btn ach-btn">${TROPHY}${t('achievements')}
-  <b>${unlockedCount()}/${ACHIEVEMENTS.length}</b></button>`;
 const FRIENDS = `<svg viewBox="0 0 24 24" class="trophy" aria-hidden="true"><path fill="currentColor" d="M9 11a4 4 0 1 0 0-8
   4 4 0 0 0 0 8zm7.5 0a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM1 20c0-3.3 3.6-6 8-6s8 2.7 8 6v1H1v-1zm17.5 1v-1c0-2-1-3.8
   -2.6-5.1 3.6.2 6.1 2.4 6.1 5.1v1h-3.5z"/></svg>`;
@@ -36,8 +28,7 @@ const GEAR = `<svg viewBox="0 0 24 24" class="trophy" aria-hidden="true"><path f
   0 7 3.5 3.5 0 0 0 0-7z"/></svg>`;
 const titleControls = () => `<div class="title-row">
   <button class="side-btn friends-btn">${FRIENDS}${t('diveFriends')}</button>
-  <button class="big-btn">${t('dive')}</button>
-  <div class="ach-slot">${achievementsButton()}</div></div>`;
+  <button class="big-btn">${t('dive')}</button></div>`;
 // Movement keys laid out as they sit on a keyboard: one key above, three below.
 const keyCluster = (up, left, down, right) => `<div class="key-grid"><kbd class="k-up">${up}</kbd>
   <kbd class="k-left">${left}</kbd><kbd class="k-down">${down}</kbd><kbd class="k-right">${right}</kbd></div>`;
@@ -108,12 +99,10 @@ export class Hud {
     });
 
     this.overlay = el('div', 'overlay');
-    this.achievementPops = el('div', 'ach-pops');
     this.questBox = el('div', 'quests');
     this.questRows = [];
     this.quests = [];
-    root.append(this.pauseBtn, this.radar, this.questBox, this.bossBar, this.banner, this.toast, this.bar, this.overlay,
-      this.achievementPops);
+    root.append(this.pauseBtn, this.radar, this.questBox, this.bossBar, this.banner, this.toast, this.bar, this.overlay);
     this.onStart = onStart;
     this.onHost = onHost;
     this.onJoin = onJoin;
@@ -197,7 +186,6 @@ export class Hud {
     });
     this.overlay.append(gear);
     this.overlay.querySelector('.big-btn').addEventListener('click', () => this.onStart());
-    this.addAchievementsButton(this.overlay.querySelector('.ach-slot'));
     this.overlay.querySelector('.friends-btn').addEventListener('click', (e) => {
       e.currentTarget.blur();
       this.showFriends();
@@ -250,9 +238,8 @@ export class Hud {
       <div class="subtitle">${t('sank', { n: stats.wave })}</div>
       <div class="stats"><div><b>${stats.kills}</b>${t('subsSunk')}</div><div><b>${stats.coins}</b>${t('coinsFound')}</div>
       <div><b>${stats.parts}</b>${t('boltedOn')}</div></div>
-      <button class="big-btn">${t('diveAgain')}</button><div class="ach-slot"></div></div>`;
+      <button class="big-btn">${t('diveAgain')}</button></div>`;
     this.overlay.querySelector('.big-btn').addEventListener('click', () => this.onStart());
-    this.addAchievementsButton(this.overlay.querySelector('.ach-slot'));
   }
 
   showPause() {
@@ -347,20 +334,11 @@ export class Hud {
     this.hints.style.setProperty('--gap', `${gap}px`);
   }
 
-  addAchievementsButton(slot) {
-    slot.innerHTML = achievementsButton();
-    slot.querySelector('.ach-btn').addEventListener('click', (e) => {
-      e.currentTarget.blur();
-      this.showAchievements();
-    });
-  }
-
   get popupOpen() {
     return Boolean(this.popup);
   }
 
-  // One window at a time opens over the title, pause or game-over screen: the achievements, the co-op controls or the
-  // settings.
+  // One window at a time opens over the title, pause or game-over screen: the co-op controls or the settings.
   // Clicking the dimmed backdrop or Back closes it.
   openPopup(html) {
     this.closePopup();
@@ -376,32 +354,6 @@ export class Hud {
   closePopup() {
     this.popup?.remove();
     this.popup = null;
-  }
-
-  // Every achievement by name, earned ones lit in gold. Pointing at or tapping one shows how to earn it.
-  showAchievements() {
-    const buttons = ACHIEVEMENTS.map((a) => `<button class="ach-tile${isUnlocked(a.id) ? ' got' : ''}" data-id="${a.id}">${
-      isUnlocked(a.id) ? TROPHY : LOCK}${a.name}</button>`).join('');
-    const share = (100 * unlockedCount()) / ACHIEVEMENTS.length;
-    const popup = this.openPopup(`<div class="ach-box">
-      <div class="ach-head">${TROPHY}${t('achievements')} <b>${unlockedCount()}/${ACHIEVEMENTS.length}</b></div>
-      <div class="ach-bar"><i style="width: ${share}%"></i></div>
-      <div class="ach-tiles">${buttons}</div>
-      <div class="ach-detail"><span class="ach-hint">${t('achHint')}</span></div>
-      <button class="coop-btn ach-close">${t('back')}</button></div>`);
-    const detail = popup.querySelector('.ach-detail');
-    const tiles = popup.querySelectorAll('.ach-tile');
-    const select = (tile) => {
-      const a = ACHIEVEMENTS.find((x) => x.id === tile.dataset.id);
-      const got = isUnlocked(a.id);
-      for (const t of tiles) t.classList.toggle('picked', t === tile);
-      detail.innerHTML = `<span class="ach-icon${got ? ' got' : ''}">${got ? TROPHY : LOCK}</span>
-        <span class="ach-text"><b>${a.name}</b><span>${a.desc}</span></span>`;
-    };
-    for (const tile of tiles) {
-      tile.addEventListener('pointerenter', () => select(tile));
-      tile.addEventListener('click', () => select(tile));
-    }
   }
 
   // Hosting or joining a shared dive, behind its own button so the title screen stays clear.
@@ -426,20 +378,6 @@ export class Hud {
       if (code.value.trim().length === 4) this.onJoin(code.value);
       else this.coopStatus(t('typeCode'));
     });
-  }
-
-  // A gold card that drops in at the top of the screen, with the coins it paid.
-  showAchievement(def, reward) {
-    const pop = el('div', 'ach-pop', `<span class="ach-icon">${TROPHY}</span><span class="ach-text">
-      <small>${t('achUnlocked')}</small><b>${def.name}</b><span>${def.desc}</span></span>
-      <span class="ach-reward"><img src="${ICON('coin')}" alt="">+${reward}</span>`);
-    this.achievementPops.append(pop);
-    // As it fades, the card pulls the ones stacked under it up into its place, so they glide there.
-    setTimeout(() => {
-      const room = pop.offsetHeight + parseFloat(getComputedStyle(this.achievementPops).rowGap);
-      pop.animate([{ marginTop: '0px' }, { marginTop: `${-room}px` }], { duration: 450, easing: 'ease-in-out', fill: 'forwards' })
-        .finished.then(() => pop.remove());
-    }, 4150);
   }
 
   // A quest that takes a finished one's place slides in where it stood.

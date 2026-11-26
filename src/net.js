@@ -240,7 +240,6 @@ export class Net {
       game.coins += ev.bonus;
       game.coinsTotal += ev.bonus;
       game.hud.showToast(t('waveCleared', { n: ev.wave, b: ev.bonus }));
-      game.waveCleared(ev.wave);
       game.hud.pulseCoins();
       sfx.coin();
     } else if (ev.t === 'banner') {

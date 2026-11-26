@@ -393,7 +393,7 @@ export const sfx = {
     tone({ type: 'sine', freq: 500, to: 1100, dur: 0.08, vol: 0.12 });
   },
   // A bright rising arpeggio with a sparkle on top.
-  achievement() {
+  questDone() {
     [784, 988, 1175, 1568].forEach((freq, i) => {
       tone({ type: 'triangle', freq, dur: 0.22, vol: 0.09, delay: i * 0.07, dry: true });
     });

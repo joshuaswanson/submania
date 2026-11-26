@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { unlock } from './achievements.js';
 import { progress } from './quests.js';
 import { sfx } from './audio.js';
 import { spawn, spawnSkinned } from './assets.js';
@@ -981,7 +980,6 @@ class PackIce {
     index.addUpdateRange(p.start, p.count);
     index.needsUpdate = true;
     this.broken++;
-    if (this.broken >= 40) unlock('icebreaker');
     progress('ice');
     const v = hull.vel;
     const pieces = Math.min(9, 2 + Math.round(p.rad * 3));
@@ -1172,8 +1170,7 @@ class Floe {
             vel: { x: p.vel.x * 0.2, y: -1.5 - Math.random() }, life: [0.6, 1.4] });
         }
         sfx.splash();
-        this.knocked = (this.knocked ?? 0) + 1;
-        if (this.knocked >= 3) unlock('penguin_bowl');
+        progress('penguin_bowl');
       }
       return;
     }
@@ -1414,7 +1411,7 @@ export class Polar {
     this.updateSnow(dt, cx, cy);
     this.updateCrystals(dt, t, cx, cy);
     if (sub && p.amount > 0.9) {
-      unlock(p.kind === 'north' ? 'north_pole' : 'south_pole');
+      progress(p.kind === 'north' ? 'north_pole' : 'south_pole');
     }
   }
 
@@ -1449,7 +1446,7 @@ export class Polar {
       if (!u.mind || Math.abs(obj.position.x - cx) > 70) continue;
       u.mind.update(dt, t, u.rig);
       placeAnimal(obj);
-      if (u.type === 'bear' && onScreen(obj.position, camera)) unlock('polar_bear');
+      if (u.type === 'bear' && onScreen(obj.position, camera)) progress('polar_bear');
     }
   }
 
@@ -1495,7 +1492,7 @@ export class Polar {
         Math.min(SURFACE_Y - 1, iceCeiling(s.position.x) - 1));
       if (!u.leaving && Math.abs(s.position.x - cx) > 60) s.position.x = cx - Math.sign(s.position.x - cx) * 55;
       if (swimStroke(u.rig, u, dt, effort) && effort > 0.3) jet(effects, s.position, swimmerBack(u));
-      if (sub && s.position.distanceTo(new THREE.Vector3(sub.x, sub.y, s.position.z)) < 5) unlock('penguin_swim');
+      if (sub && s.position.distanceTo(new THREE.Vector3(sub.x, sub.y, s.position.z)) < 5) progress('penguin_swim');
     }
   }
 
