@@ -147,35 +147,113 @@ html, body {
   position: absolute;
   top: calc(2.6vh + max(10.5vw, 110px));
   right: calc(1.4vw + env(safe-area-inset-right));
-  width: 15vw;
+  width: 20vw;
   display: flex;
   flex-direction: column;
-  gap: 0.8vh;
+  gap: 0.6vw;
 }
 .quest {
+  position: relative;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0.5vh 0.6vw;
-  padding: 0.9vh 0.8vw;
-  background: var(--navy);
-  border: 0.15vw solid var(--edge);
-  border-radius: 0.8vw;
-  box-shadow: 0 0.3vw 0.8vw rgba(0, 0, 0, 0.4);
-  transition: border-color 0.3s, box-shadow 0.3s;
+  gap: 0.45vw 0.7vw;
+  padding: 0.65vw 0.9vw;
+  background: linear-gradient(#55616d, #3a434d 55%, #2e363f);
+  border: 0.18vw solid #1a2027;
+  border-radius: 0.9vw;
+  box-shadow:
+    inset 0 0.14vw 0 rgba(255, 255, 255, 0.22),
+    inset 0 -0.25vw 0 rgba(0, 0, 0, 0.32),
+    0 0.4vw 1vw rgba(0, 0, 0, 0.45);
+  transition: box-shadow 0.3s;
 }
+.quest .bolt {
+  position: absolute;
+  width: 0.4vw;
+  height: 0.4vw;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #e6ecf2, #7d8894 60%, #3a434d);
+  box-shadow: 0 0.06vw 0.08vw rgba(0, 0, 0, 0.6);
+}
+.quest .bolt.tl { top: 0.3vw; left: 0.3vw; }
+.quest .bolt.tr { top: 0.3vw; right: 0.3vw; }
+.quest .bolt.bl { bottom: 0.3vw; left: 0.3vw; }
+.quest .bolt.br { bottom: 0.3vw; right: 0.3vw; }
+.quest .port {
+  grid-row: span 2;
+  width: 3.3vw;
+  height: 3.3vw;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #3f9bd6, #0e3d63 70%);
+  border: 0.28vw solid #c9973f;
+  box-shadow: inset 0 0 0.6vw rgba(0, 0, 0, 0.7), 0 0 0 0.12vw #5a3d12, 0 0.15vw 0.2vw rgba(0, 0, 0, 0.5);
+}
+.quest .port img { width: 78%; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.6)); }
 .quest.enter { animation: quest-in 0.5s ease-out; }
-.quest-text { font-size: 0.9vw; line-height: 1.2; color: #e4f4ff; }
-.quest-reward { display: flex; align-items: center; gap: 0.2vw; font-size: 0.9vw; font-weight: 700; color: var(--gold); }
-.quest-reward img { width: 1vw; }
-.quest-track { height: 0.5vw; background: rgba(0, 0, 0, 0.45); border-radius: 999px; overflow: hidden; }
-.quest-track i { display: block; height: 100%; background: linear-gradient(#7fe3ff, #2a9fd6); border-radius: 999px;
-  transition: width 0.3s; }
-.quest-count { font-size: 0.75vw; font-weight: 600; color: #8fb4cf; text-align: right; }
-.quest.single .quest-track, .quest.single .quest-count { display: none; }
-.quest.done { border-color: var(--gold); box-shadow: 0 0 1vw rgba(255, 200, 58, 0.5); animation: quest-done 0.5s ease-out; }
+.quest-text {
+  font-size: 1.15vw;
+  font-weight: 700;
+  line-height: 1.12;
+  text-shadow: 0 0.1vw 0 #12171c;
+}
+.quest-reward {
+  align-self: start;
+  display: flex;
+  align-items: center;
+  gap: 0.25vw;
+  padding: 0.12vw 0.5vw;
+  font-size: 1.05vw;
+  font-weight: 700;
+  color: #3a2406;
+  background: linear-gradient(#f5d27a, #c9973f 60%, #9e7128);
+  border: 0.12vw solid #5a3d12;
+  border-radius: 0.35vw;
+  box-shadow: inset 0 0.1vw 0 rgba(255, 255, 255, 0.5);
+}
+.quest-reward img { width: 1.1vw; }
+.quest-track {
+  grid-column: 2 / span 2;
+  position: relative;
+  height: 1.35vw;
+  background: #0b1626;
+  border: 0.16vw solid #050c16;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+.quest-track i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: linear-gradient(#8fe6ff, #2aa6e0 55%, #1673b0);
+  box-shadow: inset 0 0.2vw 0 rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+.quest-count {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85vw;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+.quest.single .quest-track { display: none; }
+.quest.single .port { grid-row: auto; }
+.quest.done {
+  box-shadow:
+    inset 0 0.14vw 0 rgba(255, 255, 255, 0.22),
+    0 0 0 0.2vw var(--gold),
+    0 0 1.4vw rgba(255, 200, 58, 0.7);
+  animation: quest-done 0.5s ease-out;
+}
+.quest.done .port { background: radial-gradient(circle at 40% 35%, #fff2a8, var(--gold) 55%, var(--gold-deep)); }
 .quest.done .quest-text { color: #ffe9a8; }
-.quest.done .quest-track i { background: linear-gradient(#fff2a8, var(--gold-deep)); }
+.quest.done .quest-track i { background: linear-gradient(#fff2a8, var(--gold) 55%, var(--gold-deep)); }
 @keyframes quest-in {
   from { opacity: 0; transform: translateX(3vw); }
   to { opacity: 1; transform: none; }
@@ -1090,12 +1168,18 @@ kbd {
   .ach-pop .ach-text span { font-size: 1.8vw; }
   .ach-reward { gap: 0.5vw; margin-left: 0.8vw; font-size: 2.4vw; }
   .ach-reward img { width: 2.8vw; }
-  .quests { width: 21vw; gap: 0.8vh; }
-  .quest { gap: 0.3vh 1vw; padding: 0.8vh 1.2vw; border-width: 0.25vw; border-radius: 1.2vw; }
-  .quest-text, .quest-reward { font-size: 1.45vw; }
-  .quest-reward img { width: 1.6vw; }
-  .quest-track { height: 0.7vw; }
-  .quest-count { font-size: 1.2vw; }
+  .quests { top: calc(1.6vh + max(10.5vw, 110px)); width: 38vw; gap: 0.7vw; }
+  .quest { gap: 0.4vw 1vw; padding: 0.55vw 1.2vw; border-width: 0.25vw; border-radius: 1.2vw; }
+  .quest .bolt { width: 0.55vw; height: 0.55vw; }
+  .quest .port { width: 4vw; height: 4vw; border-width: 0.35vw; }
+  .quest-text { font-size: 1.8vw; }
+  .quest-reward { font-size: 1.7vw; padding: 0.15vw 0.8vw; border-radius: 0.6vw; }
+  .quest-reward img { width: 1.8vw; }
+  .quest { grid-template-columns: auto 1fr auto auto; }
+  .quest .port { grid-row: auto; }
+  .quest-track { grid-column: 3; grid-row: 1; width: 8vw; height: 2.2vw; border-width: 0.22vw; }
+  .quest-reward { grid-column: 4; align-self: center; }
+  .quest-count { font-size: 1.25vw; }
   .ach-box.settings-box { width: min(76vw, 820px); }
   .settings-box .ach-head { font-size: 3.2vw; }
   .settings-box .setting { font-size: 2.4vw; margin-top: 2.2vh; }

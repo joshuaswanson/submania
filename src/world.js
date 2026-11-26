@@ -2189,7 +2189,10 @@ export class World {
     if (!hull.airborne) {
       const leap = this.leap;
       this.leap = null;
-      if (leap?.pal && leap.clear && (c.x - leap.from) * leap.dir > LEAP_REACH) unlock('dolphin_jump');
+      if (leap?.pal && leap.clear && (c.x - leap.from) * leap.dir > LEAP_REACH) {
+        unlock('dolphin_jump');
+        progress('dolphins');
+      }
       return;
     }
     const pod = this.dolphins;

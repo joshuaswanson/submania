@@ -4,6 +4,7 @@ import { UPGRADES, upgradeCost } from './upgrades.js';
 import { touchScreen } from './touch.js';
 
 const ICON = (name) => `${import.meta.env.BASE_URL}icons/${name}.webp`;
+const BOLTS = '<span class="bolt tl"></span><span class="bolt tr"></span><span class="bolt bl"></span><span class="bolt br"></span>';
 const LOGO = `<div class="logo-wrap"><img class="logo-img" src="${import.meta.env.BASE_URL}logo.webp" alt="Submania">
   <a class="badge" href="https://joshuaswanson.github.io" target="_blank" rel="noopener">
     <img src="${import.meta.env.BASE_URL}badge.webp" alt="by Joshua Swanson"></a></div>`;
@@ -89,7 +90,7 @@ export class Hud {
     this.bar.append(this.coinBox);
     this.slots = UPGRADES.map((def) => {
       const slot = el('button', 'slot', `
-        <span class="bolt tl"></span><span class="bolt tr"></span><span class="bolt bl"></span><span class="bolt br"></span>
+        ${BOLTS}
         <span class="port"><img src="${ICON(def.icon)}" alt=""></span>
         <span class="name"></span>
         <span class="level"></span>
@@ -447,9 +448,10 @@ export class Hud {
     quests.forEach((q, i) => {
       let row = this.questRows[i];
       if (row?.uid !== q.uid) {
-        const fresh = el('div', 'quest', `<span class="quest-text"></span>
+        const fresh = el('div', 'quest', `${BOLTS}<span class="port"><img src="${ICON(q.def.icon)}" alt=""></span>
+          <span class="quest-text"></span>
           <span class="quest-reward"><img src="${ICON('coin')}" alt="">${q.reward}</span>
-          <span class="quest-track"><i></i></span><span class="quest-count"></span>`);
+          <span class="quest-track"><i></i><span class="quest-count"></span></span>`);
         if (animate && row) fresh.classList.add('enter');
         if (row) row.el.replaceWith(fresh);
         else this.questBox.append(fresh);
